@@ -8,27 +8,70 @@ namespace Lego
         static void Main(string[] args)
         {
             var context = new LegoContext();
-
-            //control test
-            //var parts = context.LegoParts.ToList();
-            //foreach (var part in parts)
+            //var colorRepo = new LegoRepository<LegoColor>(context);
+            //var colors = colorRepo.GetAll();
+            //foreach (var color in colors)
             //{
-            //    Console.WriteLine($"Part ID: {part.PartNum}, Name: {part.Name}");
-            //} 
+            //    Console.WriteLine($"Id: {color.Id}, Name: {color.Name}, RGB: {color.Rgb}, IsTrans: {color.IsTrans}");
+            //}
+            //var inventoryRepo = new LegoRepository<LegoInventory>(context);
+            //var inventories = inventoryRepo.GetAll();
+            //foreach (var inventory in inventories)
+            //{
+            //    Console.WriteLine($"Inventory Id: {inventory.Id}, Name: {inventory.Version}");
+            //}
+            var uow = new LegoUnitOfWork(context);
 
-            var colorRepo = new Lego_Repository<LegoColor>(context);
-            var colors = colorRepo.GetAll();
-            foreach (var color in colors)
+
+            //var crimsonColor = new LegoColor
+            //{
+            //    Name = "Crimson",
+            //    Rgb = "DC143C",
+            //    IsTrans = 'f'
+            //};
+
+            //uow.AddLegoColor(crimsonColor);
+
+            //var colors = uow.GetLegoColors();
+
+            //foreach (var col in colors)
+            //{
+            //    Console.WriteLine($"{col.Id} - {col.Name}");
+            //}
+
+            // Example of using a transaction
+            //try
+            //{
+                //uow.BeginTransaction();
+
+                var testColor = new LegoColor
+                {
+                    Name = "Pippolo",
+                    Rgb = "ABCDEF",
+                    IsTrans = 't'
+                };
+
+                uow.AddLegoColor(testColor, isTransaction: true);
+                uow.BeginTransaction();
+                uow.Commit();
+            foreach (var col in uow.GetLegoColors())
             {
-                Console.WriteLine($"Color ID: {color.Id}, Name: {color.Name}, RGB: {color.Rgb}");
+                Console.WriteLine($"{col.Id} - {col.Name} - {col.Rgb} - {col.IsTrans}");
             }
 
-            var inventoryRepo = new Lego_Repository<LegoInventory>(context);
-            var inventories = inventoryRepo.GetAll();
-            foreach (var invent in inventories)
-            {
-                Console.WriteLine($"Inventory ID: {invent.Id}, Set Number: {invent.SetNum}, Version: {invent.Version}");
-            }
+                // Simula un errore per testare il rollback
+                //    bool testError = false; // Imposta a true per forzare il rollback
+                //    if (testError)
+                //        throw new Exception("Errore di test, rollback eseguito.");
+
+                //    uow.Commit();
+                //    Console.WriteLine("Transazione completata con successo.");
+                //}
+                //catch (Exception ex)
+                //{
+                //    uow.Rollback();
+                //    Console.WriteLine($"Transazione annullata: {ex.Message}");
+                //}
         }
     }
 }
